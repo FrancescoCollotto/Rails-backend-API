@@ -1,6 +1,5 @@
 class AgeValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
-    p value
     today = Date.today
     min_age = today.prev_year(16)
     age = Date.parse(value.to_s)

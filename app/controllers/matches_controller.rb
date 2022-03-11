@@ -6,6 +6,7 @@ class MatchesController < ApplicationController
     if @winner && @loser
       @match = Match.new(winner_id: @winner.id, loser_id: @loser.id)
       if @match.save
+        update_players_points
         render json: @match, status: :created
       else
         render json: @match.errors, status: :unprocessable_entity
@@ -16,7 +17,13 @@ class MatchesController < ApplicationController
   end
 
   def update_players_points
-
+    match_points = (@loser.points * POINTS_PERCENTAGE).floor
+    loser_points = @loser.points - match_points
+    winner_points = @winner.points + match_points
+    @loser.update(points: loser_points)
+    @winner.update(points: winner_points)
+    @loser.save
+    @winner.save
   end
 
   private
