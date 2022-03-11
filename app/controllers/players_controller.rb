@@ -1,29 +1,10 @@
 class PlayersController < ApplicationController
   def index
     players = Player.all
-    
-    ranked_players = players.filter { |player| 
-      player_matches = Match.where(winner_id: player.id).or(Match.where(loser_id: player.id))
-      player_matches.count >= 3
-    }
-    .map { |player| {name: player.name, nationality: player.nationality, age: calculate_age(player.birthday), points: player.points, rank_name: rank_name(player.points)} }
-    .sort_by! { |player| player[:points] }.reverse!
-
-    unranked_players = players.filter { |player| 
-      player_matches = Match.where(winner_id: player.id).or(Match.where(loser_id: player.id))
-      player_matches.count < 3
-    }
-    .map { |player| {name: player.name, nationality: player.nationality, age: calculate_age(player.birthday), points: player.points, rank_name: "Unranked"} }
-    .sort_by! { |player| player[:points] }.reverse!
-   
+    ranked_players = get_ranked_players(players)
+    unranked_players = get_unranked_players(players)
     all_players = ranked_players + unranked_players
-    
-    rank = 1
-    all_players.map!.with_index { |player, i| 
-      player[:rank] = rank
-      rank += 1 if (players[i + 1] && players[i + 1][:points] != player[:points]) || players[i + 1] && players[i + 1][:rank_name] != player[:rank_name]
-      player
-    }
+    all_players = add_ranking_position(all_players)
 
     if params[:nationality] && params[:rank_name]
       filtered_by_natio_and_rank_name = all_players.filter { |player| 
@@ -43,7 +24,6 @@ class PlayersController < ApplicationController
     else
       render json: all_players, status: :ok
     end
-    
   end
 
   def create
@@ -57,8 +37,36 @@ class PlayersController < ApplicationController
   end
 
   private
+
     def player_params
       params.require(:player).permit(:name, :nationality, :birthday, :points)
+    end
+
+    def get_ranked_players(players)
+      players.filter { |player| 
+        player_matches = Match.where(winner_id: player.id).or(Match.where(loser_id: player.id))
+        player_matches.count >= 3
+      }
+      .map { |player| {name: player.name, nationality: player.nationality, age: calculate_age(player.birthday), points: player.points, rank_name: rank_name(player.points)} }
+      .sort_by! { |player| player[:points] }.reverse!
+    end
+
+    def get_unranked_players(players)
+      players.filter { |player| 
+        player_matches = Match.where(winner_id: player.id).or(Match.where(loser_id: player.id))
+        player_matches.count < 3
+      }
+      .map { |player| {name: player.name, nationality: player.nationality, age: calculate_age(player.birthday), points: player.points, rank_name: "Unranked"} }
+      .sort_by! { |player| player[:points] }.reverse!
+    end
+
+    def add_ranking_position(players)
+      rank = 1
+      players.map.with_index { |player, i| 
+        player[:rank] = rank
+        rank += 1 if (players[i + 1] && players[i + 1][:points] != player[:points]) || players[i + 1] && players[i + 1][:rank_name] != player[:rank_name]
+        player
+      }
     end
 
     def rank_name(points)
