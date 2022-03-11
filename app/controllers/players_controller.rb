@@ -24,6 +24,25 @@ class PlayersController < ApplicationController
       rank += 1 if (players[i + 1] && players[i + 1][:points] != player[:points]) || players[i + 1] && players[i + 1][:rank_name] != player[:rank_name]
       player
     }
+
+    if params[:nationality] && params[:rank_name]
+      filtered_by_natio_and_rank_name = all_players.filter { |player| 
+        player[:nationality] == params[:nationality] && player[:rank_name] == params[:rank_name]
+      }
+      render json: filtered_by_natio_and_rank_name, status: :ok
+    elsif params[:nationality]
+      filtered_by_nationality = all_players.filter { |player| 
+        player[:nationality] == params[:nationality]
+      }
+      render json: filtered_by_nationality, status: :ok
+    elsif params[:rank_name]
+      filtered_by_rank_name = all_players.filter { |player|
+        player[:rank_name] == params[:rank_name]
+      }
+      render json: filtered_by_rank_name, status: :ok
+    else
+      render json: all_players, status: :ok
+    end
     
   end
 
