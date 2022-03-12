@@ -1,24 +1,23 @@
-# README
+# Rails Backend API
+A Rails backend API to register tennis players, retrieve tennis players data and post matches.
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Prerequisites
+Ruby, Rails, NodeJS, Postgres SQL database
 
-Things you may want to cover:
+## How to start the application
+In the project directory run `bundle install` to install dependencies  
+run `rails db:create` and `rails db:migrate` to create the database and tables  
+`rails server` to run the application on [http://localhost:3000](http://localhost:3000)
 
-* Ruby version
+## How to use
+### Endpoints
+* Register a player: POST request to http://localhost:3000/players with parameters: name, nationality, birthday, points(optional, default to 1200)
+* Retrieve all players: GET request to http://localhost:3000/players, filter search by nationality and/or rank name with parameters: nationality, rank_name
+* Register a match: POST request to http://localhost:3000/matches with parameters: winner(name of the winner player), loser(name of the loser player)
 
-* System dependencies
+Example  
+from terminal: `curl http://localhost:3000/players -v` to get all players in the database  
+or use a tool like [Postman](https://www.postman.com/)
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+## Tests
+run `rspec` in the project directory to run Rspec tests
