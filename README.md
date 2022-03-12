@@ -27,4 +27,5 @@ run `rspec` in the project directory to run Rspec tests
 ## What I would do next
 * add more unit tests
 * set cors policy to allow client side data fetch
+* update seeds.rb to seed the database for development purposes
 * research best practices on how to filter data from a GET request with parameters
