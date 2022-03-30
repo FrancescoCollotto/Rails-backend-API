@@ -1,6 +1,8 @@
 class MatchesController < ApplicationController
   POINTS_PERCENTAGE = 0.1
   def create
+    params[:winner].downcase!
+    params[:loser].downcase!
     @winner = Player.find_by(name: params[:winner])
     @loser = Player.find_by(name: params[:loser])
     if (@winner && @loser) && @winner.id != @loser.id
