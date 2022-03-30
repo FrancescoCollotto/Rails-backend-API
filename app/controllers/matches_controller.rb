@@ -3,7 +3,7 @@ class MatchesController < ApplicationController
   def create
     @winner = Player.find_by(name: params[:winner])
     @loser = Player.find_by(name: params[:loser])
-    if @winner && @loser
+    if (@winner && @loser) && @winner.id != @loser.id
       @match = Match.new(winner_id: @winner.id, loser_id: @loser.id)
       if @match.save
         update_players_points
@@ -11,6 +11,8 @@ class MatchesController < ApplicationController
       else
         render json: @match.errors, status: :unprocessable_entity
       end
+    elsif (@winner && @loser) && @winner.id == @loser.id
+      render json: { error: 'can not register a match with the same player' }, status: :unprocessable_entity
     else
       render json: { error: 'record not found' }, status: :unprocessable_entity
     end
